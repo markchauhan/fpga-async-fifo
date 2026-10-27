@@ -105,7 +105,7 @@ module tb_async_fifo;
     if (ok) $fatal(1, "write accepted while full");
     $display("fill to full: PASS");
 
-    // ---------- Step 12: drain to empty ----------
+    // ---- Step 12: drain to empty ------
     repeat (6) @(posedge rd_clk);                // let wr pointer cross
     for (int i = 0; i < DEPTH; i++) begin
       read_word(got, ok);
@@ -119,7 +119,7 @@ module tb_async_fifo;
     if (wr_full !== 1'b0) $fatal(1, "wr_full stuck at 1 after drain");
     $display("drain to empty: PASS");
 
-    // ---------- Step 13: read and write at the same time ----------
+    // ------- Step 13: read and write at the same time -------
     for (int i = 0; i < DEPTH/2; i++) push(DATA_W'(100 + i));   // half full
     repeat (6) @(posedge rd_clk);
     fork
