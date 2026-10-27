@@ -1,0 +1,28 @@
+name: sim
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sim:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Verilator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator
+
+      - name: Verilator version
+        run: verilator --version
+
+      - name: Lint
+        run: make lint
+
+      - name: Stress
+        run: make stress
+
+      - name: Meta
+        run: make meta
