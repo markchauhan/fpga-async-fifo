@@ -31,6 +31,7 @@ logic [PTR_W-1:0] wr_ptr_bin, wr_ptr_bin_next;
 logic [PTR_W-1:0] wr_ptr_gray, wr_ptr_gray_next;
 logic [PTR_W-1:0] rd_ptr_gray; //driven by read side
 logic [PTR_W-1:0] rd_ptr_gray_in_wr; //rd_ptr_gray synced in wr_clk
+
 logic wr_full_next; 
 logic wr_accept; // a write happens this cycle
 
@@ -64,4 +65,42 @@ end
 logic [ADDR_W-1:0] wr_addr; 
 assign wr_addr = wr_ptr_bin[ADDR_W-1:0];
 
+// ----- read domain ----
+logic rd_rst_n_sync; 
+reset_sync u_rd_rst_sync (
+    .clk(rd_clk), .rst_n_async(rd_rst_n), .rst_n_sync(rd_rst_n_sync)
+);
+
+logic [PTR_W-1:0] rd_ptr_bin, rd_ptr_bin_next; 
+logic [PTR_W-1:0] rd_ptr_gray_next; //
+logic [PTR_W-1:0] wr_tr_gray_in_rd; // wr_ptr_gray synced into rd_clk
+logic rd_empty_next; 
+logic rd_accept; // read happens this cycle
+
+sync_2ff #(.WIDTH(PTR_W)) u_wr_ptr_to_rd (
+    .clk(rd_clk), .rst_n(rd_rst_n_sync), 
+    .d(wr_ptr_gray), .q(wr_ptr_gray_in_rd)
+);
+
+assign rd_accept = rd_en && !rd_empty; 
+assign rd_ptr_bin_next = rd_ptr_bin + PTR_W'(rd_accept);
+assign rd_ptr_gray_next = (rd_ptr_next >> 1) ^ rd_ptr_bin_next; 
+
+// Empty = reader has caught up
+assign rd_empty_next = (rd_ptr_gray_next == wr_ptr_gray_in_rd);
+
+ always_ff @(posedge rd_clk or negedge rd_rst_n_sync) begin
+    if (!rd_rst_n_sync) begin
+        rd_ptr_bin <= '0; 
+        rd_ptr_gray <= '0;
+        rd_empty <= 1'b1;
+    end else begin 
+        rd_ptr_bin <= rd_ptr_bin_next; 
+        rd_ptr_gray <= rd_ptr_gray_next; 
+        rd_empty <= rd_empty_next; 
+    end
+ end
+ 
+ logic [ADDR_W-1:0] rd_addr; 
+ assign rd_addr = rd_ptr_bin[ADDR_W-1:0];
 endmodule
