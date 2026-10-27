@@ -9,7 +9,7 @@ SEEDS     ?= 1 2 3 4 5
 # (e.g. -Wno-vla-cxx-extension in the Homebrew bottle); GCC ignores it.
 CXXSTD    ?= -std=gnu++20
 VFLAGS    := --binary --timing -Wall -j 0 -Irtl --top-module $(TOP) \
-             -CFLAGS "$(CXXSTD) -Wno-unknown-warning-option"
+             -CFLAGS "$(CXXSTD) -Wno-unknown-warning-option" --timescale 1ns/1ps
 
 define build
 	mkdir -p build/$(1) && $(VERILATOR) $(VFLAGS) $(2) -Mdir build/$(1) $(RTL) $(TB)
