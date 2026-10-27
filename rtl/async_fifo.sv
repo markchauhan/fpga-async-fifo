@@ -103,4 +103,12 @@ assign rd_empty_next = (rd_ptr_gray_next == wr_ptr_gray_in_rd);
  
  logic [ADDR_W-1:0] rd_addr; 
  assign rd_addr = rd_ptr_bin[ADDR_W-1:0];
+
+ // -- memory --- 
+ localparam int DEPTH = 1 << ADDR_W; 
+ logic [DATA_W-1:0] mem [DEPTH]; 
+
+ always_ff @(posedge wr_clk) begin 
+    if (wr_accept) mem[wr_addr] <= wr_data; 
+ end
 endmodule
