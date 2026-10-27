@@ -1,3 +1,5 @@
+`default_nettype none
+
 module sync_2ff #(
     parameter int WIDTH = 1
 ) (

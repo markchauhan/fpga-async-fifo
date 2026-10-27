@@ -1,3 +1,5 @@
+`default_nettype none
+
 module reset_sync (
   input  logic clk,
   input  logic rst_n_async,   // raw external reset
