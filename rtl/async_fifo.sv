@@ -73,7 +73,7 @@ reset_sync u_rd_rst_sync (
 
 logic [PTR_W-1:0] rd_ptr_bin, rd_ptr_bin_next; 
 logic [PTR_W-1:0] rd_ptr_gray_next; //
-logic [PTR_W-1:0] wr_tr_gray_in_rd; // wr_ptr_gray synced into rd_clk
+logic [PTR_W-1:0] wr_ptr_gray_in_rd; // wr_ptr_gray synced into rd_clk
 logic rd_empty_next; 
 logic rd_accept; // read happens this cycle
 
@@ -84,7 +84,7 @@ sync_2ff #(.WIDTH(PTR_W)) u_wr_ptr_to_rd (
 
 assign rd_accept = rd_en && !rd_empty; 
 assign rd_ptr_bin_next = rd_ptr_bin + PTR_W'(rd_accept);
-assign rd_ptr_gray_next = (rd_ptr_next >> 1) ^ rd_ptr_bin_next; 
+assign rd_ptr_gray_next = (rd_ptr_bin_next >> 1) ^ rd_ptr_bin_next; 
 
 // Empty = reader has caught up
 assign rd_empty_next = (rd_ptr_gray_next == wr_ptr_gray_in_rd);
@@ -111,4 +111,6 @@ assign rd_empty_next = (rd_ptr_gray_next == wr_ptr_gray_in_rd);
  always_ff @(posedge wr_clk) begin 
     if (wr_accept) mem[wr_addr] <= wr_data; 
  end
+ assign rd_data = mem[rd_addr];
+ 
 endmodule

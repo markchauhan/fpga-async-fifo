@@ -23,6 +23,7 @@ endef
 
 lint:
 	$(VERILATOR) --lint-only -Wall --timing -Irtl --top-module $(TOP) $(RTL) $(TB)
+	$(VERILATOR) --lint-only -Wall -Irtl --top-module async_fifo $(RTL)
 
 sim:
 	$(call build,sim,)
